@@ -1,0 +1,671 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Fatima Riaz — Data Scientist</title>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+:root{
+  --bg:#0a0a0f;--bg2:#111118;--bg3:#16161f;--card:#1a1a25;
+  --border:rgba(139,120,255,0.15);--border2:rgba(139,120,255,0.3);
+  --purple:#8b78ff;--teal:#2dd4bf;--red:#ff5f5f;
+  --text:#e8e6f0;--muted:#8a8799;
+  --tag-bg:rgba(139,120,255,0.12);--tag-teal:rgba(45,212,191,0.12);
+}
+html{scroll-behavior:smooth;}
+body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;font-size:16px;line-height:1.7;-webkit-font-smoothing:antialiased;}
+
+/* EDIT MODE TOGGLE */
+#edit-bar{
+  position:fixed;bottom:1.5rem;right:1.5rem;z-index:999;
+  display:flex;gap:8px;align-items:center;
+}
+.edit-toggle{
+  display:flex;align-items:center;gap:8px;
+  padding:0.6rem 1.2rem;
+  background:var(--purple);color:#fff;
+  border:none;border-radius:8px;font-size:13px;font-weight:500;
+  cursor:pointer;font-family:'Inter',sans-serif;
+  box-shadow:0 0 0 1px rgba(139,120,255,0.4);
+  transition:opacity 0.2s;
+}
+.edit-toggle:hover{opacity:0.88;}
+.edit-toggle.active{background:#1a1a25;color:var(--teal);border:0.5px solid var(--teal);}
+#save-btn{
+  display:none;padding:0.6rem 1.2rem;
+  background:var(--teal);color:#0a0a0f;
+  border:none;border-radius:8px;font-size:13px;font-weight:600;
+  cursor:pointer;font-family:'Inter',sans-serif;transition:opacity 0.2s;
+}
+#save-btn:hover{opacity:0.85;}
+.edit-mode #save-btn{display:block;}
+
+/* EDIT OVERLAYS */
+.editable{position:relative;}
+.edit-mode .editable:hover::after{
+  content:'click to edit';
+  position:absolute;top:-22px;left:0;
+  font-size:10px;color:var(--teal);
+  font-family:'JetBrains Mono',monospace;letter-spacing:0.08em;
+  pointer-events:none;
+}
+.edit-mode .editable{
+  outline:1px dashed rgba(139,120,255,0.25);
+  border-radius:4px;cursor:text;
+  padding:2px 4px;margin:-2px -4px;
+  transition:outline-color 0.15s;
+}
+.edit-mode .editable:hover{outline-color:var(--purple);}
+.edit-mode .editable:focus{
+  outline:1.5px solid var(--purple);
+  background:rgba(139,120,255,0.06);
+  border-radius:4px;
+}
+
+/* MODAL */
+.modal-overlay{
+  display:none;position:fixed;inset:0;z-index:1000;
+  background:rgba(0,0,0,0.7);
+  align-items:center;justify-content:center;
+}
+.modal-overlay.open{display:flex;}
+.modal{
+  background:#16161f;border:0.5px solid var(--border2);
+  border-radius:14px;padding:2rem;width:90%;max-width:520px;
+  max-height:90vh;overflow-y:auto;
+}
+.modal h3{font-size:1rem;font-weight:600;margin-bottom:1.25rem;color:var(--text);}
+.modal label{display:block;font-size:12px;color:var(--muted);margin-bottom:4px;font-family:'JetBrains Mono',monospace;letter-spacing:0.05em;}
+.modal input,.modal textarea,.modal select{
+  width:100%;background:#0f0f18;border:0.5px solid var(--border2);
+  color:var(--text);border-radius:6px;padding:0.6rem 0.8rem;
+  font-size:14px;font-family:'Inter',sans-serif;
+  margin-bottom:1rem;outline:none;
+}
+.modal input:focus,.modal textarea:focus{border-color:var(--purple);}
+.modal textarea{resize:vertical;min-height:90px;}
+.modal-actions{display:flex;justify-content:flex-end;gap:8px;margin-top:0.5rem;}
+.btn-cancel{
+  padding:0.5rem 1.1rem;background:transparent;
+  border:0.5px solid var(--border2);color:var(--muted);
+  border-radius:6px;font-size:13px;cursor:pointer;font-family:'Inter',sans-serif;
+}
+.btn-save{
+  padding:0.5rem 1.1rem;background:var(--purple);
+  border:none;color:#fff;border-radius:6px;
+  font-size:13px;font-weight:500;cursor:pointer;font-family:'Inter',sans-serif;
+}
+.btn-del{
+  padding:0.5rem 1rem;background:transparent;
+  border:0.5px solid var(--red);color:var(--red);
+  border-radius:6px;font-size:13px;cursor:pointer;font-family:'Inter',sans-serif;
+  margin-right:auto;
+}
+
+/* NAV */
+nav{
+  position:fixed;top:0;left:0;right:0;z-index:100;
+  background:rgba(10,10,15,0.88);backdrop-filter:blur(12px);
+  border-bottom:0.5px solid var(--border);
+  padding:0 2rem;display:flex;align-items:center;justify-content:space-between;height:60px;
+}
+.nav-logo{font-family:'JetBrains Mono',monospace;font-size:14px;color:var(--purple);letter-spacing:0.05em;}
+.nav-links{display:flex;gap:2rem;list-style:none;}
+.nav-links a{font-size:13px;color:var(--muted);text-decoration:none;letter-spacing:0.03em;transition:color 0.2s;}
+.nav-links a:hover{color:var(--text);}
+
+/* HERO */
+.hero{min-height:100vh;display:flex;align-items:center;padding-top:60px;position:relative;overflow:hidden;}
+.hero-label{font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--teal);letter-spacing:0.15em;text-transform:uppercase;margin-bottom:1.5rem;}
+.hero h1{font-size:clamp(2.8rem,6vw,4.5rem);font-weight:600;line-height:1.1;letter-spacing:-0.02em;margin-bottom:1.25rem;}
+.hero h1 span{color:var(--purple);}
+.hero-typewriter{font-family:'JetBrains Mono',monospace;font-size:1.05rem;color:var(--teal);margin-bottom:1.5rem;min-height:1.8rem;}
+.cursor{display:inline-block;width:2px;height:1.1em;background:var(--teal);vertical-align:middle;margin-left:2px;animation:blink 1s step-end infinite;}
+@keyframes blink{50%{opacity:0;}}
+.hero-desc{font-size:1rem;color:var(--muted);max-width:540px;margin-bottom:2.5rem;line-height:1.85;}
+.hero-ctas{display:flex;gap:1rem;flex-wrap:wrap;}
+.btn-primary{display:inline-flex;align-items:center;gap:8px;padding:0.7rem 1.6rem;background:var(--purple);color:#fff;text-decoration:none;border-radius:6px;font-size:14px;font-weight:500;transition:opacity 0.2s,transform 0.15s;border:none;cursor:pointer;font-family:'Inter',sans-serif;}
+.btn-primary:hover{opacity:0.88;transform:translateY(-1px);}
+.btn-outline{display:inline-flex;align-items:center;gap:8px;padding:0.7rem 1.6rem;border:0.5px solid var(--border2);color:var(--text);text-decoration:none;border-radius:6px;font-size:14px;font-weight:500;transition:border-color 0.2s,transform 0.15s;}
+.btn-outline:hover{border-color:var(--purple);transform:translateY(-1px);}
+
+/* SECTION */
+section{padding:5.5rem 0;}
+.container{max-width:860px;margin:0 auto;padding:0 2rem;}
+.section-header{display:flex;align-items:center;gap:1rem;margin-bottom:2.5rem;}
+.section-label{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--purple);letter-spacing:0.15em;text-transform:uppercase;white-space:nowrap;}
+.section-line{flex:1;height:0.5px;background:var(--border);}
+
+/* ADD BUTTONS (edit mode only) */
+.add-btn{
+  display:none;align-items:center;gap:6px;
+  padding:0.5rem 1rem;margin-top:1rem;
+  border:0.5px dashed var(--border2);
+  background:transparent;color:var(--muted);
+  border-radius:6px;font-size:13px;cursor:pointer;
+  font-family:'Inter',sans-serif;transition:border-color 0.2s,color 0.2s;
+  width:100%;justify-content:center;
+}
+.add-btn:hover{border-color:var(--purple);color:var(--purple);}
+.edit-mode .add-btn{display:flex;}
+
+/* ABOUT */
+.about-grid{display:grid;grid-template-columns:1fr 1fr;gap:2rem;align-items:start;}
+.about-text{color:var(--muted);line-height:1.85;}
+.about-text p{margin-bottom:1rem;}
+.about-stats{display:grid;grid-template-columns:1fr 1fr;gap:1rem;}
+.stat-card{background:var(--card);border:0.5px solid var(--border);border-radius:10px;padding:1.25rem;position:relative;}
+.stat-num{font-family:'JetBrains Mono',monospace;font-size:1.8rem;font-weight:700;color:var(--purple);line-height:1;margin-bottom:0.3rem;}
+.stat-label{font-size:12px;color:var(--muted);}
+.item-edit-btn{
+  display:none;position:absolute;top:8px;right:8px;
+  background:transparent;border:0.5px solid var(--border2);
+  color:var(--muted);border-radius:4px;padding:2px 8px;
+  font-size:11px;cursor:pointer;font-family:'JetBrains Mono',monospace;
+}
+.edit-mode .item-edit-btn{display:block;}
+.item-edit-btn:hover{border-color:var(--purple);color:var(--purple);}
+
+/* SKILLS */
+.skills-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:1rem;}
+.skill-group{background:var(--card);border:0.5px solid var(--border);border-radius:10px;padding:1.25rem;position:relative;}
+.skill-group-title{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--teal);letter-spacing:0.1em;text-transform:uppercase;margin-bottom:0.8rem;}
+.skill-tags{display:flex;flex-wrap:wrap;gap:6px;}
+.tag{font-size:12px;padding:3px 10px;border-radius:4px;background:var(--tag-bg);color:var(--purple);font-family:'JetBrains Mono',monospace;}
+.tag.teal{background:var(--tag-teal);color:var(--teal);}
+
+/* PROJECT */
+.project-card{background:var(--card);border:0.5px solid var(--border);border-radius:12px;padding:2rem;position:relative;margin-bottom:1.25rem;transition:border-color 0.25s;}
+.project-card:hover{border-color:var(--border2);}
+.project-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--purple),var(--teal));border-radius:12px 12px 0 0;}
+.project-top{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:1rem;gap:1rem;}
+.project-name{font-size:1.2rem;font-weight:600;}
+.project-name em{color:var(--purple);font-style:normal;}
+.project-badge{font-family:'JetBrains Mono',monospace;font-size:11px;padding:4px 10px;border-radius:4px;background:rgba(45,212,191,0.1);color:var(--teal);border:0.5px solid rgba(45,212,191,0.2);white-space:nowrap;}
+.project-desc{color:var(--muted);margin-bottom:1.25rem;line-height:1.8;font-size:15px;}
+.project-stack{display:flex;flex-wrap:wrap;gap:6px;}
+
+/* TIMELINE */
+.timeline{position:relative;}
+.timeline::before{content:'';position:absolute;left:7px;top:8px;bottom:8px;width:0.5px;background:var(--border);}
+.timeline-item{padding-left:2.5rem;margin-bottom:2.5rem;position:relative;}
+.timeline-dot{position:absolute;left:0;top:8px;width:15px;height:15px;border-radius:50%;border:0.5px solid var(--purple);background:var(--bg);display:flex;align-items:center;justify-content:center;}
+.timeline-dot::after{content:'';width:5px;height:5px;border-radius:50%;background:var(--purple);}
+.timeline-date{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--teal);letter-spacing:0.08em;margin-bottom:0.25rem;}
+.timeline-role{font-size:1rem;font-weight:600;margin-bottom:0.1rem;}
+.timeline-org{font-size:14px;color:var(--muted);margin-bottom:0.5rem;}
+.timeline-desc{font-size:14px;color:var(--muted);line-height:1.75;}
+
+/* CERTS */
+.cert-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:1rem;}
+.cert-card{background:var(--card);border:0.5px solid var(--border);border-radius:10px;padding:1.25rem;display:flex;gap:0.85rem;align-items:flex-start;transition:border-color 0.2s;position:relative;}
+.cert-card:hover{border-color:var(--border2);}
+.cert-icon{width:34px;height:34px;border-radius:8px;background:var(--tag-bg);display:flex;align-items:center;justify-content:center;font-size:15px;flex-shrink:0;}
+.cert-name{font-size:13px;font-weight:500;margin-bottom:2px;}
+.cert-issuer{font-size:12px;color:var(--muted);}
+
+/* CONTACT */
+.contact-inner{background:var(--card);border:0.5px solid var(--border);border-radius:12px;padding:3rem;text-align:center;}
+.contact-inner h3{font-size:1.4rem;font-weight:600;margin-bottom:0.75rem;letter-spacing:-0.02em;}
+.contact-inner p{color:var(--muted);margin-bottom:2rem;}
+.contact-links{display:flex;justify-content:center;flex-wrap:wrap;gap:1rem;}
+.contact-link{display:inline-flex;align-items:center;gap:8px;padding:0.65rem 1.4rem;border:0.5px solid var(--border2);color:var(--text);text-decoration:none;border-radius:6px;font-size:14px;transition:border-color 0.2s,color 0.2s;}
+.contact-link:hover{border-color:var(--purple);color:var(--purple);}
+.contact-link svg{width:15px;height:15px;}
+
+footer{border-top:0.5px solid var(--border);padding:2rem;text-align:center;font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--muted);}
+
+@media(max-width:640px){
+  .about-grid{grid-template-columns:1fr;}
+  .nav-links{display:none;}
+  .hero h1{font-size:2.4rem;}
+  .contact-inner{padding:2rem 1.25rem;}
+}
+</style>
+</head>
+<body>
+
+<!-- EDIT BAR -->
+<div id="edit-bar">
+  <button id="save-btn" onclick="saveAll()">💾 Save changes</button>
+  <button class="edit-toggle" id="edit-toggle-btn" onclick="toggleEdit()">✏️ Edit portfolio</button>
+</div>
+
+<!-- MODAL -->
+<div class="modal-overlay" id="modal">
+  <div class="modal">
+    <h3 id="modal-title">Edit entry</h3>
+    <div id="modal-body"></div>
+    <div class="modal-actions">
+      <button class="btn-del" id="modal-del" style="display:none" onclick="deleteEntry()">Delete</button>
+      <button class="btn-cancel" onclick="closeModal()">Cancel</button>
+      <button class="btn-save" onclick="saveModal()">Save</button>
+    </div>
+  </div>
+</div>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-logo">fatima.riaz</div>
+  <ul class="nav-links">
+    <li><a href="#about">about</a></li>
+    <li><a href="#projects">projects</a></li>
+    <li><a href="#experience">experience</a></li>
+    <li><a href="#skills">skills</a></li>
+    <li><a href="#contact">contact</a></li>
+  </ul>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="container">
+    <p class="hero-label editable" contenteditable="false" data-key="hero_label">// available for opportunities</p>
+    <h1>Fatima <span class="editable" contenteditable="false" data-key="hero_name">Riaz</span></h1>
+    <div class="hero-typewriter" id="typewriter"><span class="cursor"></span></div>
+    <p class="hero-desc editable" contenteditable="false" data-key="hero_desc">BS Data Science graduate building AI-powered products. I work at the intersection of machine learning, language models, and real-world impact — currently teaching and building at a non-profit while crafting tools that make data meaningful.</p>
+    <div class="hero-ctas">
+      <a href="#projects" class="btn-primary">⚡ View Project</a>
+      <a href="#contact" class="btn-outline">Get in touch →</a>
+    </div>
+  </div>
+</section>
+
+<!-- ABOUT -->
+<section id="about">
+  <div class="container">
+    <div class="section-header"><span class="section-label">01 / about</span><div class="section-line"></div></div>
+    <div class="about-grid">
+      <div class="about-text">
+        <p class="editable" contenteditable="false" data-key="about_p1">I'm a Data Science graduate from Pakistan, passionate about turning raw data into something that actually changes how people think and act. My work spans the full ML pipeline — from data wrangling to deploying LLM-powered applications.</p>
+        <p class="editable" contenteditable="false" data-key="about_p2">Right now, I'm teaching computer skills at a non-profit, which has sharpened my ability to explain complex technical concepts clearly — a skill I bring to every project.</p>
+        <p class="editable" contenteditable="false" data-key="about_p3">I thrive at the intersection of AI and product thinking, and I'm actively looking for opportunities in data science, ML engineering, and AI development.</p>
+      </div>
+      <div class="about-stats" id="stats-grid"></div>
+    </div>
+    <button class="add-btn" onclick="openAddStat()">+ Add stat card</button>
+  </div>
+</section>
+
+<!-- PROJECTS -->
+<section id="projects" style="padding-top:2rem;">
+  <div class="container">
+    <div class="section-header"><span class="section-label">02 / projects</span><div class="section-line"></div></div>
+    <div id="projects-list"></div>
+    <button class="add-btn" onclick="openAddProject()">+ Add project</button>
+  </div>
+</section>
+
+<!-- EXPERIENCE -->
+<section id="experience">
+  <div class="container">
+    <div class="section-header"><span class="section-label">03 / experience</span><div class="section-line"></div></div>
+    <div class="timeline" id="experience-list"></div>
+    <button class="add-btn" onclick="openAddExperience()">+ Add experience</button>
+  </div>
+</section>
+
+<!-- SKILLS -->
+<section id="skills" style="padding-top:2rem;">
+  <div class="container">
+    <div class="section-header"><span class="section-label">04 / skills</span><div class="section-line"></div></div>
+    <div class="skills-grid" id="skills-grid"></div>
+    <button class="add-btn" onclick="openAddSkillGroup()">+ Add skill group</button>
+  </div>
+</section>
+
+<!-- CERTIFICATIONS -->
+<section style="padding-top:2rem;">
+  <div class="container">
+    <div class="section-header"><span class="section-label">05 / certifications</span><div class="section-line"></div></div>
+    <div class="cert-grid" id="cert-grid"></div>
+    <button class="add-btn" onclick="openAddCert()">+ Add certification</button>
+  </div>
+</section>
+
+<!-- CONTACT -->
+<section id="contact">
+  <div class="container">
+    <div class="section-header"><span class="section-label">06 / contact</span><div class="section-line"></div></div>
+    <div class="contact-inner">
+      <h3 class="editable" contenteditable="false" data-key="contact_heading">Let's build something together</h3>
+      <p class="editable" contenteditable="false" data-key="contact_desc">Open to data science roles, ML engineering positions, and AI product opportunities. Based in Karachi — open to remote.</p>
+      <div class="contact-links">
+        <a href="#" id="link-email" class="contact-link">
+          <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+          Email
+        </a>
+        <a href="#" id="link-linkedin" class="contact-link" target="_blank">
+          <svg fill="currentColor" viewBox="0 0 24 24"><path d="M16 8a6 6 0 016 6v7h-4v-7a2 2 0 00-2-2 2 2 0 00-2 2v7h-4v-7a6 6 0 016-6zM2 9h4v12H2z"/><circle cx="4" cy="4" r="2"/></svg>
+          LinkedIn
+        </a>
+        <a href="#" id="link-github" class="contact-link" target="_blank">
+          <svg fill="currentColor" viewBox="0 0 24 24"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 00-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0020 4.77 5.07 5.07 0 0019.91 1S18.73.65 16 2.48a13.38 13.38 0 00-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 005 4.77a5.44 5.44 0 00-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 009 18.13V22"/></svg>
+          GitHub
+        </a>
+      </div>
+      <div style="margin-top:1.5rem;" class="edit-mode-only" id="contact-edit-section" style="display:none;">
+        <button class="add-btn" style="max-width:300px;margin:0 auto;" onclick="openEditContact()">✏️ Edit contact links</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <span class="editable" contenteditable="false" data-key="footer_text">built by fatima riaz · 2025 · karachi, pakistan</span>
+</footer>
+
+<script>
+const DEFAULTS = {
+  hero_label:'// available for opportunities',
+  hero_name:'Riaz',
+  hero_desc:"BS Data Science graduate building AI-powered products. I work at the intersection of machine learning, language models, and real-world impact — currently teaching and building at a non-profit while crafting tools that make data meaningful.",
+  about_p1:"I'm a Data Science graduate from Pakistan, passionate about turning raw data into something that actually changes how people think and act. My work spans the full ML pipeline — from data wrangling to deploying LLM-powered applications.",
+  about_p2:"Right now, I'm teaching computer skills at a non-profit, which has sharpened my ability to explain complex technical concepts clearly — a skill I bring to every project.",
+  about_p3:"I thrive at the intersection of AI and product thinking, and I'm actively looking for opportunities in data science, ML engineering, and AI development.",
+  contact_heading:"Let's build something together",
+  contact_desc:"Open to data science roles, ML engineering positions, and AI product opportunities. Based in Karachi — open to remote.",
+  footer_text:"built by fatima riaz · 2025 · karachi, pakistan",
+  contact_email:'fatima@email.com',
+  contact_linkedin:'https://linkedin.com/in/fatimariaz',
+  contact_github:'https://github.com/fatimariaz',
+  stats:[
+    {num:'2025',label:'BS Data Science graduate'},
+    {num:'1+',label:'Industry internship'},
+    {num:'AI',label:'Full-stack portfolio project'},
+    {num:'NPO',label:'Currently teaching CS'}
+  ],
+  projects:[
+    {
+      name:'Reflekt',subtitle:'AI Journaling App',badge:'Full-Stack · End-to-End',
+      desc:'An AI-powered journaling application that analyzes your entries over time to surface hidden emotional patterns and behavioral trends — making you more self-aware, one entry at a time.',
+      stack:'Python,LangChain,RAG,LLM Pipelines,Vector DB,NLP,Full-Stack'
+    }
+  ],
+  experience:[
+    {date:'2025 — Present',role:'Computer Science Instructor',org:'Non-Profit Organization · Karachi, Pakistan',desc:'Teaching foundational and applied computer science concepts to students from underserved communities. Designing curriculum, simplifying complex technical topics, and building a pipeline from digital literacy to practical tech skills.'},
+    {date:'2024',role:'Data Science Intern',org:'Industry Internship',desc:'Applied data analysis and machine learning techniques to real-world datasets. Contributed to data pipelines, model experimentation, and insight reporting in a professional team environment.'},
+    {date:'2021 — 2025',role:'BS Data Science',org:'University · Pakistan',desc:'Four-year undergraduate program covering statistics, machine learning, deep learning, NLP, data engineering, and software development. Graduated 2025.'}
+  ],
+  skills:[
+    {title:'AI / LLM',tags:'LLM Pipelines,RAG,LangChain,Prompt Engineering,Embeddings',color:'purple'},
+    {title:'Machine Learning',tags:'scikit-learn,NLP,Deep Learning,Model Evaluation',color:'purple'},
+    {title:'Data & Engineering',tags:'Python,SQL,Pandas,NumPy,Vector DBs',color:'teal'},
+    {title:'Tools & Stack',tags:'Git,Jupyter,APIs,Full-Stack Dev',color:'teal'}
+  ],
+  certs:[
+    {icon:'🐍',name:'Python for Data Science',issuer:'Professional Certification'},
+    {icon:'🤖',name:'Machine Learning',issuer:'Professional Certification'},
+    {icon:'🧠',name:'LLM & Generative AI',issuer:'Professional Certification'},
+    {icon:'📊',name:'Data Analysis',issuer:'Professional Certification'}
+  ]
+};
+
+let data = JSON.parse(JSON.stringify(DEFAULTS));
+let editMode = false;
+let modalContext = null;
+
+function load(){
+  try{
+    const saved = localStorage.getItem('fatima_portfolio_v2');
+    if(saved) data = JSON.parse(saved);
+  }catch(e){}
+}
+
+function saveAll(){
+  document.querySelectorAll('.editable[data-key]').forEach(el=>{
+    data[el.dataset.key] = el.innerText.trim();
+  });
+  localStorage.setItem('fatima_portfolio_v2', JSON.stringify(data));
+  const btn = document.getElementById('save-btn');
+  btn.textContent = '✓ Saved!';
+  setTimeout(()=>{ btn.textContent = '💾 Save changes'; },1800);
+}
+
+function render(){
+  renderStats();
+  renderProjects();
+  renderExperience();
+  renderSkills();
+  renderCerts();
+  renderTextFields();
+  renderContactLinks();
+}
+
+function renderTextFields(){
+  document.querySelectorAll('.editable[data-key]').forEach(el=>{
+    const key = el.dataset.key;
+    if(data[key] !== undefined) el.innerText = data[key];
+  });
+}
+
+function renderContactLinks(){
+  const em = document.getElementById('link-email');
+  const li = document.getElementById('link-linkedin');
+  const gh = document.getElementById('link-github');
+  if(em) em.href = 'mailto:' + (data.contact_email||'');
+  if(li) li.href = data.contact_linkedin||'#';
+  if(gh) gh.href = data.contact_github||'#';
+}
+
+function renderStats(){
+  const g = document.getElementById('stats-grid');
+  g.innerHTML = '';
+  (data.stats||[]).forEach((s,i)=>{
+    const d = document.createElement('div');
+    d.className = 'stat-card';
+    d.innerHTML = `<button class="item-edit-btn" onclick="openEditStat(${i})">edit</button><div class="stat-num">${s.num}</div><div class="stat-label">${s.label}</div>`;
+    g.appendChild(d);
+  });
+}
+
+function renderProjects(){
+  const g = document.getElementById('projects-list');
+  g.innerHTML = '';
+  (data.projects||[]).forEach((p,i)=>{
+    const tags = (p.stack||'').split(',').map(t=>`<span class="tag">${t.trim()}</span>`).join('');
+    const d = document.createElement('div');
+    d.className = 'project-card';
+    d.innerHTML = `
+      <button class="item-edit-btn" onclick="openEditProject(${i})">edit</button>
+      <div class="project-top">
+        <div class="project-name"><em>${p.name}</em>${p.subtitle?' — '+p.subtitle:''}</div>
+        ${p.badge?`<span class="project-badge">${p.badge}</span>`:''}
+      </div>
+      <p class="project-desc">${p.desc}</p>
+      <div class="project-stack">${tags}</div>`;
+    g.appendChild(d);
+  });
+}
+
+function renderExperience(){
+  const g = document.getElementById('experience-list');
+  g.innerHTML = '';
+  (data.experience||[]).forEach((e,i)=>{
+    const d = document.createElement('div');
+    d.className = 'timeline-item';
+    d.innerHTML = `
+      <div class="timeline-dot"></div>
+      <button class="item-edit-btn" onclick="openEditExp(${i})">edit</button>
+      <div class="timeline-date">${e.date}</div>
+      <div class="timeline-role">${e.role}</div>
+      <div class="timeline-org">${e.org}</div>
+      <div class="timeline-desc">${e.desc}</div>`;
+    g.appendChild(d);
+  });
+}
+
+function renderSkills(){
+  const g = document.getElementById('skills-grid');
+  g.innerHTML = '';
+  (data.skills||[]).forEach((s,i)=>{
+    const tags = (s.tags||'').split(',').map(t=>`<span class="tag ${s.color==='teal'?'teal':''}">${t.trim()}</span>`).join('');
+    const d = document.createElement('div');
+    d.className = 'skill-group';
+    d.innerHTML = `
+      <button class="item-edit-btn" onclick="openEditSkill(${i})">edit</button>
+      <div class="skill-group-title">${s.title}</div>
+      <div class="skill-tags">${tags}</div>`;
+    g.appendChild(d);
+  });
+}
+
+function renderCerts(){
+  const g = document.getElementById('cert-grid');
+  g.innerHTML = '';
+  (data.certs||[]).forEach((c,i)=>{
+    const d = document.createElement('div');
+    d.className = 'cert-card';
+    d.innerHTML = `
+      <button class="item-edit-btn" onclick="openEditCert(${i})">edit</button>
+      <div class="cert-icon">${c.icon}</div>
+      <div><div class="cert-name">${c.name}</div><div class="cert-issuer">${c.issuer}</div></div>`;
+    g.appendChild(d);
+  });
+}
+
+function toggleEdit(){
+  editMode = !editMode;
+  document.body.classList.toggle('edit-mode', editMode);
+  const btn = document.getElementById('edit-toggle-btn');
+  btn.textContent = editMode ? '👁 Preview' : '✏️ Edit portfolio';
+  btn.classList.toggle('active', editMode);
+  document.querySelectorAll('.editable').forEach(el=>{
+    el.contentEditable = editMode ? 'true' : 'false';
+  });
+  const ces = document.getElementById('contact-edit-section');
+  if(ces) ces.style.display = editMode ? 'block' : 'none';
+}
+
+/* MODAL HELPERS */
+function field(label,id,val,type='text',placeholder=''){
+  if(type==='textarea') return `<label>${label}</label><textarea id="${id}" placeholder="${placeholder}">${val||''}</textarea>`;
+  return `<label>${label}</label><input type="${type}" id="${id}" value="${val||''}" placeholder="${placeholder}">`;
+}
+function fv(id){ const el=document.getElementById(id); return el?el.value.trim():''; }
+
+function openModal(title, bodyHTML, ctx, showDel){
+  document.getElementById('modal-title').textContent = title;
+  document.getElementById('modal-body').innerHTML = bodyHTML;
+  document.getElementById('modal-del').style.display = showDel?'block':'none';
+  modalContext = ctx;
+  document.getElementById('modal').classList.add('open');
+}
+function closeModal(){ document.getElementById('modal').classList.remove('open'); modalContext=null; }
+
+function saveModal(){
+  if(modalContext) modalContext.save();
+  closeModal();
+  render();
+}
+function deleteEntry(){
+  if(modalContext && modalContext.del) modalContext.del();
+  closeModal();
+  render();
+}
+
+/* STAT */
+function openAddStat(){
+  openModal('Add stat card',
+    field('Number / label (e.g. 2025)','s_num','')+field('Description','s_label',''),
+    {save:()=>{ data.stats.push({num:fv('s_num'),label:fv('s_label')}); }}, false);
+}
+function openEditStat(i){
+  const s=data.stats[i];
+  openModal('Edit stat card',
+    field('Number / label','s_num',s.num)+field('Description','s_label',s.label),
+    {save:()=>{ data.stats[i]={num:fv('s_num'),label:fv('s_label')}; }, del:()=>{ data.stats.splice(i,1); }}, true);
+}
+
+/* PROJECT */
+function openAddProject(){
+  openModal('Add project',
+    field('Project name','p_name','')+field('Subtitle (optional)','p_sub','')+field('Badge text (optional)','p_badge','')+field('Description','p_desc','','textarea')+field('Tech stack (comma-separated)','p_stack',''),
+    {save:()=>{ data.projects.push({name:fv('p_name'),subtitle:fv('p_sub'),badge:fv('p_badge'),desc:fv('p_desc'),stack:fv('p_stack')}); }}, false);
+}
+function openEditProject(i){
+  const p=data.projects[i];
+  openModal('Edit project',
+    field('Project name','p_name',p.name)+field('Subtitle','p_sub',p.subtitle)+field('Badge text','p_badge',p.badge)+field('Description','p_desc',p.desc,'textarea')+field('Tech stack (comma-separated)','p_stack',p.stack),
+    {save:()=>{ data.projects[i]={name:fv('p_name'),subtitle:fv('p_sub'),badge:fv('p_badge'),desc:fv('p_desc'),stack:fv('p_stack')}; }, del:()=>{ data.projects.splice(i,1); }}, true);
+}
+
+/* EXPERIENCE */
+function openAddExperience(){
+  openModal('Add experience',
+    field('Date / period','e_date','')+field('Role / title','e_role','')+field('Organization','e_org','')+field('Description','e_desc','','textarea'),
+    {save:()=>{ data.experience.unshift({date:fv('e_date'),role:fv('e_role'),org:fv('e_org'),desc:fv('e_desc')}); }}, false);
+}
+function openEditExp(i){
+  const e=data.experience[i];
+  openModal('Edit experience',
+    field('Date / period','e_date',e.date)+field('Role / title','e_role',e.role)+field('Organization','e_org',e.org)+field('Description','e_desc',e.desc,'textarea'),
+    {save:()=>{ data.experience[i]={date:fv('e_date'),role:fv('e_role'),org:fv('e_org'),desc:fv('e_desc')}; }, del:()=>{ data.experience.splice(i,1); }}, true);
+}
+
+/* SKILLS */
+function openAddSkillGroup(){
+  openModal('Add skill group',
+    field('Group title','sk_title','')+`<label>Color accent</label><select id="sk_color"><option value="purple">Purple (AI/LLM)</option><option value="teal">Teal (Data/Tools)</option></select>`+field('Skills (comma-separated)','sk_tags',''),
+    {save:()=>{ data.skills.push({title:fv('sk_title'),color:fv('sk_color'),tags:fv('sk_tags')}); }}, false);
+}
+function openEditSkill(i){
+  const s=data.skills[i];
+  openModal('Edit skill group',
+    field('Group title','sk_title',s.title)+`<label>Color accent</label><select id="sk_color"><option value="purple" ${s.color==='purple'?'selected':''}>Purple (AI/LLM)</option><option value="teal" ${s.color==='teal'?'selected':''}>Teal (Data/Tools)</option></select>`+field('Skills (comma-separated)','sk_tags',s.tags),
+    {save:()=>{ data.skills[i]={title:fv('sk_title'),color:fv('sk_color'),tags:fv('sk_tags')}; }, del:()=>{ data.skills.splice(i,1); }}, true);
+}
+
+/* CERTS */
+function openAddCert(){
+  openModal('Add certification',
+    field('Emoji icon','c_icon','📜')+field('Certification name','c_name','')+field('Issuer / platform','c_issuer',''),
+    {save:()=>{ data.certs.push({icon:fv('c_icon'),name:fv('c_name'),issuer:fv('c_issuer')}); }}, false);
+}
+function openEditCert(i){
+  const c=data.certs[i];
+  openModal('Edit certification',
+    field('Emoji icon','c_icon',c.icon)+field('Certification name','c_name',c.name)+field('Issuer / platform','c_issuer',c.issuer),
+    {save:()=>{ data.certs[i]={icon:fv('c_icon'),name:fv('c_name'),issuer:fv('c_issuer')}; }, del:()=>{ data.certs.splice(i,1); }}, true);
+}
+
+/* CONTACT LINKS */
+function openEditContact(){
+  openModal('Edit contact links',
+    field('Your email','ct_email',data.contact_email)+field('LinkedIn URL','ct_li',data.contact_linkedin)+field('GitHub URL','ct_gh',data.contact_github),
+    {save:()=>{ data.contact_email=fv('ct_email'); data.contact_linkedin=fv('ct_li'); data.contact_github=fv('ct_gh'); renderContactLinks(); }}, false);
+}
+
+/* TYPEWRITER */
+const roles=['Data Scientist','AI / LLM Engineer','Full-Stack Builder','CS Educator','Pattern Finder'];
+let rIdx=0,cIdx=0,del=false,pausing=false;
+function type(){
+  const role=roles[rIdx];
+  const el=document.getElementById('typewriter');
+  if(!el) return;
+  if(pausing){pausing=false;setTimeout(type,1200);return;}
+  if(!del){
+    cIdx++;
+    el.innerHTML=role.slice(0,cIdx)+'<span class="cursor"></span>';
+    if(cIdx===role.length){del=true;pausing=true;setTimeout(type,80);return;}
+    setTimeout(type,75);
+  }else{
+    cIdx--;
+    el.innerHTML=role.slice(0,cIdx)+'<span class="cursor"></span>';
+    if(cIdx===0){del=false;rIdx=(rIdx+1)%roles.length;setTimeout(type,400);return;}
+    setTimeout(type,40);
+  }
+}
+
+/* CLOSE MODAL ON BACKDROP */
+document.getElementById('modal').addEventListener('click',function(e){
+  if(e.target===this) closeModal();
+});
+
+load();
+render();
+type();
+</script>
+</body>
+</html>
