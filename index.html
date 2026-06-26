@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Fatima Riaz</title>
+<title>Fatima Riaz — Data Scientist</title>
 <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
@@ -17,32 +17,7 @@
 html{scroll-behavior:smooth;}
 body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;font-size:16px;line-height:1.7;-webkit-font-smoothing:antialiased;}
 
-/* EDIT MODE TOGGLE */
-#edit-bar{
-  position:fixed;bottom:1.5rem;right:1.5rem;z-index:999;
-  display:flex;gap:8px;align-items:center;
-}
-.edit-toggle{
-  display:flex;align-items:center;gap:8px;
-  padding:0.6rem 1.2rem;
-  background:var(--purple);color:#fff;
-  border:none;border-radius:8px;font-size:13px;font-weight:500;
-  cursor:pointer;font-family:'Inter',sans-serif;
-  box-shadow:0 0 0 1px rgba(139,120,255,0.4);
-  transition:opacity 0.2s;
-}
-.edit-toggle:hover{opacity:0.88;}
-.edit-toggle.active{background:#1a1a25;color:var(--teal);border:0.5px solid var(--teal);}
-#save-btn{
-  display:none;padding:0.6rem 1.2rem;
-  background:var(--teal);color:#0a0a0f;
-  border:none;border-radius:8px;font-size:13px;font-weight:600;
-  cursor:pointer;font-family:'Inter',sans-serif;transition:opacity 0.2s;
-}
-#save-btn:hover{opacity:0.85;}
-.edit-mode #save-btn{display:block;}
 
-/* EDIT OVERLAYS */
 .editable{position:relative;}
 .edit-mode .editable:hover::after{
   content:'click to edit';
@@ -64,47 +39,7 @@ body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;font-
   border-radius:4px;
 }
 
-/* MODAL */
-.modal-overlay{
-  display:none;position:fixed;inset:0;z-index:1000;
-  background:rgba(0,0,0,0.7);
-  align-items:center;justify-content:center;
-}
-.modal-overlay.open{display:flex;}
-.modal{
-  background:#16161f;border:0.5px solid var(--border2);
-  border-radius:14px;padding:2rem;width:90%;max-width:520px;
-  max-height:90vh;overflow-y:auto;
-}
-.modal h3{font-size:1rem;font-weight:600;margin-bottom:1.25rem;color:var(--text);}
-.modal label{display:block;font-size:12px;color:var(--muted);margin-bottom:4px;font-family:'JetBrains Mono',monospace;letter-spacing:0.05em;}
-.modal input,.modal textarea,.modal select{
-  width:100%;background:#0f0f18;border:0.5px solid var(--border2);
-  color:var(--text);border-radius:6px;padding:0.6rem 0.8rem;
-  font-size:14px;font-family:'Inter',sans-serif;
-  margin-bottom:1rem;outline:none;
-}
-.modal input:focus,.modal textarea:focus{border-color:var(--purple);}
-.modal textarea{resize:vertical;min-height:90px;}
-.modal-actions{display:flex;justify-content:flex-end;gap:8px;margin-top:0.5rem;}
-.btn-cancel{
-  padding:0.5rem 1.1rem;background:transparent;
-  border:0.5px solid var(--border2);color:var(--muted);
-  border-radius:6px;font-size:13px;cursor:pointer;font-family:'Inter',sans-serif;
-}
-.btn-save{
-  padding:0.5rem 1.1rem;background:var(--purple);
-  border:none;color:#fff;border-radius:6px;
-  font-size:13px;font-weight:500;cursor:pointer;font-family:'Inter',sans-serif;
-}
-.btn-del{
-  padding:0.5rem 1rem;background:transparent;
-  border:0.5px solid var(--red);color:var(--red);
-  border-radius:6px;font-size:13px;cursor:pointer;font-family:'Inter',sans-serif;
-  margin-right:auto;
-}
 
-/* NAV */
 nav{
   position:fixed;top:0;left:0;right:0;z-index:100;
   background:rgba(10,10,15,0.88);backdrop-filter:blur(12px);
@@ -138,20 +73,7 @@ section{padding:5.5rem 0;}
 .section-label{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--purple);letter-spacing:0.15em;text-transform:uppercase;white-space:nowrap;}
 .section-line{flex:1;height:0.5px;background:var(--border);}
 
-/* ADD BUTTONS (edit mode only) */
-.add-btn{
-  display:none;align-items:center;gap:6px;
-  padding:0.5rem 1rem;margin-top:1rem;
-  border:0.5px dashed var(--border2);
-  background:transparent;color:var(--muted);
-  border-radius:6px;font-size:13px;cursor:pointer;
-  font-family:'Inter',sans-serif;transition:border-color 0.2s,color 0.2s;
-  width:100%;justify-content:center;
-}
-.add-btn:hover{border-color:var(--purple);color:var(--purple);}
-.edit-mode .add-btn{display:flex;}
 
-/* ABOUT */
 .about-grid{display:grid;grid-template-columns:1fr 1fr;gap:2rem;align-items:start;}
 .about-text{color:var(--muted);line-height:1.85;}
 .about-text p{margin-bottom:1rem;}
@@ -227,18 +149,8 @@ footer{border-top:0.5px solid var(--border);padding:2rem;text-align:center;font-
 </head>
 <body>
 
+<!-- MODAL REMOVED -->
 
-<!-- MODAL -->
-<div class="modal-overlay" id="modal">
-  <div class="modal">
-    <h3 id="modal-title">Edit entry</h3>
-    <div id="modal-body"></div>
-    <div class="modal-actions">
-      <button class="btn-del" id="modal-del" style="display:none" onclick="deleteEntry()">Delete</button>
-      <button class="btn-cancel" onclick="closeModal()">Cancel</button>
-      <button class="btn-save" onclick="saveModal()">Save</button>
-    </div>
-  </div>
 </div>
 
 <!-- NAV -->
@@ -256,9 +168,14 @@ footer{border-top:0.5px solid var(--border);padding:2rem;text-align:center;font-
 <!-- HERO -->
 <section class="hero">
   <div class="container">
+    <p class="hero-label editable" contenteditable="false" data-key="hero_label">// available for opportunities</p>
     <h1>Fatima <span class="editable" contenteditable="false" data-key="hero_name">Riaz</span></h1>
     <div class="hero-typewriter" id="typewriter"><span class="cursor"></span></div>
-    <p class="hero-desc editable" contenteditable="false" data-key="hero_desc">BS Data Science graduate building AI-powered products. I work at the intersection of AI, Data, LLMs and real-world impact.</p>
+    <p class="hero-desc editable" contenteditable="false" data-key="hero_desc">BS Data Science graduate building AI-powered products. I work at the intersection of machine learning, language models, and real-world impact — currently teaching and building at a non-profit while crafting tools that make data meaningful.</p>
+    <div class="hero-ctas">
+      <a href="#projects" class="btn-primary">⚡ View Project</a>
+      <a href="#contact" class="btn-outline">Get in touch →</a>
+    </div>
   </div>
 </section>
 
@@ -268,12 +185,13 @@ footer{border-top:0.5px solid var(--border);padding:2rem;text-align:center;font-
     <div class="section-header"><span class="section-label">01 / about</span><div class="section-line"></div></div>
     <div class="about-grid">
       <div class="about-text">
-        <p class="editable" contenteditable="false" data-key="about_p1">I'm a Data Science graduate, passionate about building AI Products that actually changes how people think and act.</p>
-        <p class="editable" contenteditable="false" data-key="about_p2">Right now, I'm teaching Tech skills at Zindagi Trust (non-profit), which has sharpened my ability to explain complex technical concepts clearly</p>
+        <p class="editable" contenteditable="false" data-key="about_p1">I'm a Data Science graduate from Pakistan, passionate about turning raw data into something that actually changes how people think and act. My work spans the full ML pipeline — from data wrangling to deploying LLM-powered applications.</p>
+        <p class="editable" contenteditable="false" data-key="about_p2">Right now, I'm teaching computer skills at a non-profit, which has sharpened my ability to explain complex technical concepts clearly — a skill I bring to every project.</p>
+        <p class="editable" contenteditable="false" data-key="about_p3">I thrive at the intersection of AI and product thinking, and I'm actively looking for opportunities in data science, ML engineering, and AI development.</p>
       </div>
       <div class="about-stats" id="stats-grid"></div>
     </div>
-    <button class="add-btn" onclick="openAddStat()">+ Add stat card</button>
+    
   </div>
 </section>
 
@@ -282,7 +200,7 @@ footer{border-top:0.5px solid var(--border);padding:2rem;text-align:center;font-
   <div class="container">
     <div class="section-header"><span class="section-label">02 / projects</span><div class="section-line"></div></div>
     <div id="projects-list"></div>
-    <button class="add-btn" onclick="openAddProject()">+ Add project</button>
+    
   </div>
 </section>
 
@@ -291,7 +209,7 @@ footer{border-top:0.5px solid var(--border);padding:2rem;text-align:center;font-
   <div class="container">
     <div class="section-header"><span class="section-label">03 / experience</span><div class="section-line"></div></div>
     <div class="timeline" id="experience-list"></div>
-    <button class="add-btn" onclick="openAddExperience()">+ Add experience</button>
+    
   </div>
 </section>
 
@@ -300,7 +218,7 @@ footer{border-top:0.5px solid var(--border);padding:2rem;text-align:center;font-
   <div class="container">
     <div class="section-header"><span class="section-label">04 / skills</span><div class="section-line"></div></div>
     <div class="skills-grid" id="skills-grid"></div>
-    <button class="add-btn" onclick="openAddSkillGroup()">+ Add skill group</button>
+    
   </div>
 </section>
 
@@ -309,7 +227,7 @@ footer{border-top:0.5px solid var(--border);padding:2rem;text-align:center;font-
   <div class="container">
     <div class="section-header"><span class="section-label">05 / certifications</span><div class="section-line"></div></div>
     <div class="cert-grid" id="cert-grid"></div>
-    <button class="add-btn" onclick="openAddCert()">+ Add certification</button>
+    
   </div>
 </section>
 
@@ -319,6 +237,7 @@ footer{border-top:0.5px solid var(--border);padding:2rem;text-align:center;font-
     <div class="section-header"><span class="section-label">06 / contact</span><div class="section-line"></div></div>
     <div class="contact-inner">
       <h3 class="editable" contenteditable="false" data-key="contact_heading">Let's build something together</h3>
+      <p class="editable" contenteditable="false" data-key="contact_desc">Open to data science roles, ML engineering positions, and AI product opportunities. Based in Karachi — open to remote.</p>
       <div class="contact-links">
         <a href="#" id="link-email" class="contact-link">
           <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
@@ -333,40 +252,45 @@ footer{border-top:0.5px solid var(--border);padding:2rem;text-align:center;font-
           GitHub
         </a>
       </div>
-      <div style="margin-top:1.5rem;" class="edit-mode-only" id="contact-edit-section" style="display:none;">
-        <button class="add-btn" style="max-width:300px;margin:0 auto;" onclick="openEditContact()">✏️ Edit contact links</button>
       </div>
-    </div>
   </div>
 </section>
 
+<footer>
+  <span class="editable" contenteditable="false" data-key="footer_text">built by fatima riaz · 2025 · karachi, pakistan</span>
+</footer>
+
 <script>
 const DEFAULTS = {
+  hero_label:'// available for opportunities',
   hero_name:'Riaz',
-  hero_desc:"BS Data Science graduate building AI-powered products. I work at the intersection of AI, Data, LLMs and real-world impact",
-  about_p1:"I'm a Data Science graduate, passionate about building AI Products that actually changes how people think and act",
-  about_p2:"Right now, I'm teaching computer skills at a non-profit, which has sharpened my ability to explain complex technical concepts clearly",
+  hero_desc:"BS Data Science graduate building AI-powered products. I work at the intersection of machine learning, language models, and real-world impact — currently teaching and building at a non-profit while crafting tools that make data meaningful.",
+  about_p1:"I'm a Data Science graduate from Pakistan, passionate about turning raw data into something that actually changes how people think and act. My work spans the full ML pipeline — from data wrangling to deploying LLM-powered applications.",
+  about_p2:"Right now, I'm teaching computer skills at a non-profit, which has sharpened my ability to explain complex technical concepts clearly — a skill I bring to every project.",
+  about_p3:"I thrive at the intersection of AI and product thinking, and I'm actively looking for opportunities in data science, ML engineering, and AI development.",
   contact_heading:"Let's build something together",
-  contact_email:'fatimarz2580@gmail.com',
-  contact_linkedin:'https://www.linkedin.com/in/fatimarzz12/',
-  contact_github:'https://github.com/Fatimarz',
+  contact_desc:"Open to data science roles, ML engineering positions, and AI product opportunities. Based in Karachi — open to remote.",
+  footer_text:"built by fatima riaz · 2025 · karachi, pakistan",
+  contact_email:'fatima@email.com',
+  contact_linkedin:'https://linkedin.com/in/fatimariaz',
+  contact_github:'https://github.com/fatimariaz',
   stats:[
     {num:'2025',label:'BS Data Science graduate'},
-    {num:'1+',label:'Industry Experience'},
+    {num:'1+',label:'Industry internship'},
     {num:'AI',label:'Full-stack portfolio project'},
-    {num:'NPO',label:'Current Employment'}
+    {num:'NPO',label:'Currently teaching CS'}
   ],
   projects:[
     {
       name:'Reflekt',subtitle:'AI Journaling App',badge:'Full-Stack · End-to-End',
-      desc:'An AI-powered Journaling App that analyzes your entries over time to surface hidden emotional patterns and behavioral trends, making you more self-aware.',
+      desc:'An AI-powered journaling application that analyzes your entries over time to surface hidden emotional patterns and behavioral trends — making you more self-aware, one entry at a time.',
       stack:'Python,LangChain,RAG,LLM Pipelines,Vector DB,NLP,Full-Stack'
     }
   ],
   experience:[
-    {date:'2025 — Present',role:'IT Instructor',org:'Zindagi Trust · Karachi, Pakistan',desc:'Teaching coding and applied computer science concepts to students from underserved communities. Designing curriculum, simplifying complex technical topics, and building a pipeline from digital literacy to practical tech skills.'},
-    {date:'2025',role:'Machine Learning Intern',org:'NextGenLearners',desc:'Applied data analysis and machine learning algorithms to real-world datasets.'},
-    {date:'2020 — 2025',role:'BS Data Science',org:'Institute of Business Management'}
+    {date:'2025 — Present',role:'Computer Science Instructor',org:'Non-Profit Organization · Karachi, Pakistan',desc:'Teaching foundational and applied computer science concepts to students from underserved communities. Designing curriculum, simplifying complex technical topics, and building a pipeline from digital literacy to practical tech skills.'},
+    {date:'2024',role:'Data Science Intern',org:'Industry Internship',desc:'Applied data analysis and machine learning techniques to real-world datasets. Contributed to data pipelines, model experimentation, and insight reporting in a professional team environment.'},
+    {date:'2021 — 2025',role:'BS Data Science',org:'University · Pakistan',desc:'Four-year undergraduate program covering statistics, machine learning, deep learning, NLP, data engineering, and software development. Graduated 2025.'}
   ],
   skills:[
     {title:'AI / LLM',tags:'LLM Pipelines,RAG,LangChain,Prompt Engineering,Embeddings',color:'purple'},
@@ -375,10 +299,10 @@ const DEFAULTS = {
     {title:'Tools & Stack',tags:'Git,Jupyter,APIs,Full-Stack Dev',color:'teal'}
   ],
   certs:[
-    {icon:'🐍',name:'Working with the OpenAI API',issuer:'datacamp'},
-    {icon:'🤖',name:'Prompt Engineering with the OpenAI API',issuer:'datacamp'},
-    {icon:'🧠',name:'LLMOps Concepts',issuer:'datacamp'},
-    {icon:'📊',name:'Working with Hugging Face',issuer:'datacamp'}
+    {icon:'🐍',name:'Python for Data Science',issuer:'Professional Certification'},
+    {icon:'🤖',name:'Machine Learning',issuer:'Professional Certification'},
+    {icon:'🧠',name:'LLM & Generative AI',issuer:'Professional Certification'},
+    {icon:'📊',name:'Data Analysis',issuer:'Professional Certification'}
   ]
 };
 
@@ -505,6 +429,18 @@ function renderCerts(){
   });
 }
 
+function toggleEdit(){
+  editMode = !editMode;
+  document.body.classList.toggle('edit-mode', editMode);
+  const btn = document.getElementById('edit-toggle-btn');
+  btn.textContent = editMode ? '👁 Preview' : '✏️ Edit portfolio';
+  btn.classList.toggle('active', editMode);
+  document.querySelectorAll('.editable').forEach(el=>{
+    el.contentEditable = editMode ? 'true' : 'false';
+  });
+  const ces = document.getElementById('contact-edit-section');
+  if(ces) ces.style.display = editMode ? 'block' : 'none';
+}
 
 /* MODAL HELPERS */
 function field(label,id,val,type='text',placeholder=''){
@@ -606,7 +542,7 @@ function openEditContact(){
 }
 
 /* TYPEWRITER */
-const roles=['Data Scientist','AI / LLM Engineer','Full-Stack Builder','CS Educator'];
+const roles=['Data Scientist','AI / LLM Engineer','Full-Stack Builder','CS Educator','Pattern Finder'];
 let rIdx=0,cIdx=0,del=false,pausing=false;
 function type(){
   const role=roles[rIdx];
@@ -631,7 +567,6 @@ document.getElementById('modal').addEventListener('click',function(e){
   if(e.target===this) closeModal();
 });
 
-load();
 render();
 type();
 </script>
