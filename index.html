@@ -227,11 +227,6 @@ footer{border-top:0.5px solid var(--border);padding:2rem;text-align:center;font-
 </head>
 <body>
 
-<!-- EDIT BAR -->
-<div id="edit-bar">
-  <button id="save-btn" onclick="saveAll()">💾 Save changes</button>
-  <button class="edit-toggle" id="edit-toggle-btn" onclick="toggleEdit()">✏️ Edit portfolio</button>
-</div>
 
 <!-- MODAL -->
 <div class="modal-overlay" id="modal">
@@ -348,10 +343,9 @@ footer{border-top:0.5px solid var(--border);padding:2rem;text-align:center;font-
 <script>
 const DEFAULTS = {
   hero_name:'Riaz',
-  hero_desc:"BS Data Science graduate building AI-powered products. I work at the intersection of machine learning, language models, and real-world impact — currently teaching and building at a non-profit while crafting tools that make data meaningful.",
-  about_p1:"I'm a Data Science graduate from Pakistan, passionate about turning raw data into something that actually changes how people think and act. My work spans the full ML pipeline — from data wrangling to deploying LLM-powered applications.",
-  about_p2:"Right now, I'm teaching computer skills at a non-profit, which has sharpened my ability to explain complex technical concepts clearly — a skill I bring to every project.",
-  about_p3:"I thrive at the intersection of AI and product thinking, and I'm actively looking for opportunities in data science, ML engineering, and AI development.",
+  hero_desc:"BS Data Science graduate building AI-powered products. I work at the intersection of AI, Data, LLMs and real-world impact",
+  about_p1:"I'm a Data Science graduate, passionate about building AI Products that actually changes how people think and act",
+  about_p2:"Right now, I'm teaching computer skills at a non-profit, which has sharpened my ability to explain complex technical concepts clearly",
   contact_heading:"Let's build something together",
   contact_email:'fatimarz2580@gmail.com',
   contact_linkedin:'https://www.linkedin.com/in/fatimarzz12/',
@@ -511,18 +505,6 @@ function renderCerts(){
   });
 }
 
-function toggleEdit(){
-  editMode = !editMode;
-  document.body.classList.toggle('edit-mode', editMode);
-  const btn = document.getElementById('edit-toggle-btn');
-  btn.textContent = editMode ? '👁 Preview' : '✏️ Edit portfolio';
-  btn.classList.toggle('active', editMode);
-  document.querySelectorAll('.editable').forEach(el=>{
-    el.contentEditable = editMode ? 'true' : 'false';
-  });
-  const ces = document.getElementById('contact-edit-section');
-  if(ces) ces.style.display = editMode ? 'block' : 'none';
-}
 
 /* MODAL HELPERS */
 function field(label,id,val,type='text',placeholder=''){
